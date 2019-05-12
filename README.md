@@ -16,15 +16,16 @@ da pilha: Zabbix + Postgresql + Grafana sobre Docker Compose.
         - [ECOD3 (comercial)](https://www.youtube.com/channel/UCEfxXAAIp5ndiLEJXqqFRmg)
         - [Universo OpenSource](https://www.youtube.com/c/universoopensource)
     - Outros links
-    - [Site comercial](https://ecod3.com)
-    - [Linkdin](https://www.linkedin.com/in/leandro-augusto-bucardi-3a271126/)
-    - [Cursos Udemy](https://www.udemy.com/user/leandro-augusto-bucardi/)
+        - [Site comercial](https://ecod3.com)
+        - [Linkdin](https://www.linkedin.com/in/leandro-augusto-bucardi-3a271126/)
+        - [Cursos Udemy](https://www.udemy.com/user/leandro-augusto-bucardi/)
 
 ## Roteiro
 
 - Deploy (simples)
-- Zabbix client
 - Grafana
+- Zabbix client
+- Zabbix proxy
 - Devops like (Melhorando a pilha/stack)
     - Tratando volumes persistente
     - Ajustes finos (arquivos de configurações)
