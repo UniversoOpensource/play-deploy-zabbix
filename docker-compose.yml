@@ -1,0 +1,110 @@
+#######################################################################################
+#
+# Playground de stack: Zabbix + Postgresql + Grafana
+#
+#######################################################################################
+#
+# Por Leandro Bucardi, <leandro@ecod3.com>, <leandro@leandroaugusto.eti.br>
+# Neste video demonstro como montar uma pilha (baseado em docker-compose)
+# para monitoramento de ativos tecnologico.
+# Source: https://github.com/UniversoOpensource/play-deploy-zabbix.git
+#
+#######################################################################################
+
+version: '2.1'
+
+
+#########################################################################
+# Services containers
+
+services:
+
+
+    #########################################################################
+    # Zabbix PostgreSQL Database
+    # https://hub.docker.com/r/zabbix/zabbix-server-pgsql
+
+    ecod3-play-database-postgres:
+        container_name: ecod3-play-database-postgres
+        hostname: ecod3-play-database-postgres
+        image: postgres:latest
+        user: root
+        volumes:
+            - /data/volumes/database/postgresql/data:/var/lib/postgresql/data:rw
+        environment:
+            - POSTGRES_USER=zabbix
+            - POSTGRES_PASSWORD=ecod3foryou
+        networks:
+            - core
+            - monitor
+
+
+    #########################################################################
+    # Zabbix Server container
+    # https://hub.docker.com/r/zabbix/zabbix-server-pgsql
+
+    ecod3-play-zabbix-server:
+        container_name: ecod3-play-zabbix-server
+        hostname: ecod3-play-zabbix-server
+        image: zabbix/zabbix-server-pgsql:alpine-4.2-latest
+        user: root
+        env_file:
+            - .env/zabbix_server
+            - .env/zabbix_db_pgsql
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+        networks:
+            - core
+        links:
+            - ecod3-play-database-postgres:database
+        ports:
+            - "10051:10051"
+
+
+
+    #########################################################################
+    # Zabbix UI
+
+    ecod3-play-zabbix-web:
+        container_name: ecod3-play-zabbix-web
+        hostname: ecod3-play-zabbix-web
+        image: zabbix/zabbix-web-nginx-pgsql:alpine-4.2-latest
+        user: root
+        env_file:
+            - .env/zabbix_web
+            - .env/zabbix_db_pgsql
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - /etc/timezone:/etc/timezone:ro
+        networks:
+            - core
+        links:
+            - ecod3-play-database-postgres:database
+            - ecod3-play-zabbix-server:server
+
+
+    #########################################################################
+    # Grafana UI
+
+    ecod3-play-grafana:
+        container_name:  ecod3-play-grafana
+        hostname:  ecod3-play-grafana
+        image: grafana/grafana
+        user: "root"
+        volumes:
+            - /data/volumes/monitor/grafana/var:/var/lib/grafana:rw
+        networks:
+            - core
+        links:
+            - ecod3-play-database-postgres:database
+            - monitor-zabbix-server:zabbix
+
+
+
+#########################################################################
+# Network service
+
+networks:
+    core:
+        external: true
